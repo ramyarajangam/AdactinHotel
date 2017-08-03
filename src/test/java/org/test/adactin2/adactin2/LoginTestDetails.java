@@ -16,15 +16,14 @@ import utility.Base;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LoginTestDetails extends Base {
 	static WebDriver driver;
-	static Base base;
+	//static Base base;
 	LoginPage loginPage;
 	SearchPage searchpage;
 	//SearchPage searchPage;
-	
+	Base base = new Base();
 	@BeforeClass	
-	public static void launchBrowser() {
-		base = new Base();
-		driver = Base.getBrowser("fireFox");		
+	public static void launchBrowser() {		
+		driver = getDriver();		
 	}
 //	@Test
 //	public void VerifyLoginDetails() {
@@ -91,7 +90,7 @@ public class LoginTestDetails extends Base {
 	@Test
 	public void bsearchHotel1() {
 		searchpage = new SearchPage(driver);		
-		Assert.assertTrue(elementFound(driver, 10, searchpage.getBtnLogOut()));
+		//Assert.assertTrue(elementFound(driver, 10, searchpage.getBtnLogOut()));
 		
 		dropDownSelect(searchpage.getDpdLocation(), readValueFromExcelSheet().get(1).get("Location"));		
 		dropDownSelect(searchpage.getDpdHotel(), readValueFromExcelSheet().get(1).get("Hotel"));		

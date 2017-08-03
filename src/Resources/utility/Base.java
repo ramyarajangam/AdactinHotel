@@ -2,6 +2,7 @@ package utility;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,6 +20,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -35,27 +38,37 @@ import org.test.adactin2.adactin2.LoginPage;
 public class Base {
 	static WebDriver driver;
 	WebDriverWait wait;
+	static File f1 = new File("./JSON/Configuration.json");
 
-	public static WebDriver getBrowser(String browser) {
-		if (browser.equals("fireFox")) {
-			System.setProperty("webdriver.gecko.driver",
-					"C:/Users/ramya/workspace/adactin2/Driver/geckodriver.exe");
-			driver = new FirefoxDriver();
-		} else if (browser.equals("chrome")) {
-			System.setProperty("webdriver.chrome.driver",
-					"C:/Users/ramya/workspace/adactin2/Driver/chromedriver.exe");
+	
+	public static WebDriver getDriver() {
+		JSONObject jsonObject = JSONReadFromFile();
+		String browser = (String) jsonObject.get("browser");
+
+		File f = new File("./driver");
+		if (browser.equals("chrome")) {
+			System.setProperty("webdriver.chrome.driver", f.getAbsolutePath()
+					+ "/chromedriver.exe");
 			driver = new ChromeDriver();
+
+		} else if (browser.equals("firefox")) {
+			System.setProperty("webdriver.gecko.driver", f.getAbsolutePath()
+					+ "/geckodriver.exe");
+			driver = new FirefoxDriver();
+
 		} else if (browser.equals("ie")) {
-			System.setProperty("webdriver.ie.driver",
-					"C:/Users/ramya/workspace/adactin2/Driver/IEDriverServer.exe");
+			System.setProperty("webdriver.ie.driver", f.getAbsolutePath()
+					+ "/IEDriverServer.exe");
 			driver = new InternetExplorerDriver();
+
 		}
+
 		driver.manage().window().maximize();
-		driver.get("http://www.adactin.com/HotelApp/");
+		driver.get((String) jsonObject.get("url"));
 		return driver;
 	}
-
-	public boolean elementToBeVisible(WebDriver driver, int time,
+	
+		public boolean elementToBeVisible(WebDriver driver, int time,
 			WebElement element) {
 		boolean flag = false;
 		try {
@@ -143,6 +156,20 @@ public class Base {
 	public void dropDownSelect(WebElement element,String name) {
 		Select s=new Select(element) ;
 		s.selectByValue(name);
+	}
+	public static JSONObject JSONReadFromFile() {
+		JSONParser parser = new JSONParser();
+		JSONObject jsonObject = null;
+		try {
+
+			Object obj = parser.parse(new FileReader(f1.getAbsoluteFile()));
+
+			jsonObject = (JSONObject) obj;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return jsonObject;
 	}
 	public static void getScreenShot(String screenShotFileName) {
 		File screenShotLocation = new File("./screenshot/" + screenShotFileName
